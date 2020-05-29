@@ -1,0 +1,19 @@
+{
+  "name": "bytes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "checkSum.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "jest": "^26.0.1",
+    "mocha": "^7.2.0"
+  },
+  "dependencies": {
+    "mysql": "^2.18.1"
+  }
+}
