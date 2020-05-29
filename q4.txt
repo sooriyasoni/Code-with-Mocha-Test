@@ -1,0 +1,66 @@
+# SQL Querying
+
+Given the following table which tracks app events:
+
+```sql
+create table app_events (
+  bot_id text not null,
+  event_id bigserial not null,
+  aggregate_type text not null,
+  aggregate_id text not null,
+  event_type text not null,
+  event_data jsonb not null,
+  created_at timestamp default now() not null,
+  primary key app_events_pkey (event_id) 
+);
+```
+
+## A Basic Query
+
+One of the events tracked is whenever a user visits a given “state” in a conversation/workflow, write a query to count the number of times each of these states is visited in a given month: `reorder-allergy-info`, `reorder`, and `reorder-pay`. Your query should take the `bot_id` and month as parameters; assume that the `event_type` for this is `VisitState` and that the state name is stored in a field called `StateName` withing the `event_data`.
+
+## Performance
+
+Oops! The events table has millions of rows in it and your query is taking an unacceptable amount of time to run, how would you go about improving this?
+
+------------------//-------Answer-----------//-----------------------------------------------
+following steps will help you understand the query,
+
+step 1: create a table 
+step 2: created indexing on table column name created_at to improve performance of select query
+step 3: Inserted multiple rows in table 
+step 4: select data and Grouping the data by extracting the month from created_at (timestamp)  column, count of event_type which is also event StateName by using index idx_event in query
+step 6: Grouping the data by month,event_type, bot_id
+
+
+create table app_events (
+  bot_id text not null,
+  event_id bigserial not null,
+  aggregate_type text not null,
+  aggregate_id text not null,
+  event_type text not null,
+  event_data jsonb not null,
+  created_at timestamp default now() not null,
+  primary key app_events_pkey (event_id) 
+);
+
+
+CREATE INDEX idx_event
+ON app_events (created_at);
+
+
+INSERT INTO `app_events` (`bot_id`, `event_id`, `aggregate_type`, `aggregate_id`, `event_type`, `event_data`, `created_at`) VALUES
+('facebook', 1, 'blockchain', 'blockchain', 'reorder', '{\"StateName\": \"reorder\"}', '2020-02-29 00:32:08'),
+('insta', 2, 'blockchain', 'blockchain', 'reorder-allergy-info', '{\"StateName\": \"reorder-allergy-info\"}', '2020-02-29 00:32:08'),
+('facebook', 3, 'blockchain', 'blockchain', 'reorder', '{\"StateName\": \"reorder\"}', '2020-02-29 00:32:08'),
+('insta', 4, 'blockchain', 'blockchain', 'reorder-allergy-info', '{\"StateName\": \"reorder-allergy-info\"}', '2020-02-29 00:32:08'),
+('facebook', 5, 'blockchain', 'blockchain', 'reorder-allergy-info', '{\"StateName\": \"reorder-allergy-info\"}', '2020-03-29 00:32:08'),
+('facebook', 6, 'blockchain', 'blockchain', 'reorder-allergy-info', '{\"StateName\": \"reorder-allergy-info\"}', '2020-04-28 23:32:08'),
+('insta', 7, 'blockchain', 'blockchain', 'reorder-allergy-info', '{\"StateName\": \"reorder-allergy-info\"}', '2020-05-28 23:32:08');
+
+select * from app_events;
+
+SELECT bot_id, MONTHNAME(created_at) AS MONTH,  event_type, count(event_type) as event_month_count
+FROM app_events  USE INDEX(idx_event)
+GROUP BY Month,bot_id, event_type;
+
